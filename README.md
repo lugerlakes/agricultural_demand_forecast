@@ -1,42 +1,51 @@
 # **Demand Forecasting for Agricultural Products**
-*Inventory Optimization with Hybrid Model (GBR + GPD)*
+*A Senior-Level Analysis in Model Validation & Economic Backtesting*
 --
 ## 1. Project Summary
-This project is a Data Science solution for an agricultural products distributor. The objective is to solve the critical business problems of excess inventory and lost sales (stockouts), which were being caused by an inaccurate forecasting model.
+This project documents the development of a Data Science solution for an agricultural products distributor facing critical inventory problems. While the initial goal was to build a complex hybrid model, the project's key finding came from a rigorous economic backtest that invalidated this hypothesis.
 
-The solution is not just a single model but a hybrid decision pipeline that separates forecasting from risk management:
+The analysis, performed on 2023 data, revealed two crucial insights:
 
-1. **Core Model (GBR)**: A GradientBoostingRegressor (GBR) machine learning model that accurately predicts the base demand (the mean).
+1. The complex "Hybrid Model" (GBR + Risk) was a financial disaster, generating $-7.44 Billion in net losses due to extreme data outliers creating massive waste costs.
 
-2. **Risk Model (GPD)**: An advanced statistical model, Generalized Pareto Distribution (GPD), that models extreme events (demand spikes) and calculates a dynamic safety stock for each product individually.
+2. The "GBR Base Model" (high-precision forecast) was the clear winner, outperforming the client's current model_actual by $610 Million in net benefit.
 
-The final result is a complete inventory policy that tells the business not just what they are likely to sell, but what they must order to profitably achieve a 98% service level.
+This project evolved from a forecasting challenge into a senior-level case study on how to use economic backtesting to validate a hypothesis, pivot, and select the optimal, high-value solution.
 
 ## 2. The Business Problem
 The client was facing two primary, costly challenges:
 
-1. **Excess Inventory**: The previous model (modelo_actual) often overestimated demand for predictable products, leading to high storage costs and spoilage of perishable goods.
+1. **Excess Inventory**: The previous model (model_actual) often overestimated demand, leading to high storage costs and spoilage of perishable goods.
 
-2. **Lost Sales**: The same model underestimated demand for volatile products, failing to predict demand spikes. This resulted in stockouts, lost revenue, and customer dissatisfaction.
+2. **Lost Sales**: The same model underestimated demand for volatile products, resulting in stockouts and lost revenue.
 
-## 3. Key Results
-The new hybrid model outperformed the existing modelo_actual on all key metrics during validation (using all of 2023 data):
+## 3. Key Findings: Economic Backtest
+Instead of relying on technical metrics like WAPE alone, we simulated the financial performance of three models on 2023 data. This economic backtest became the core of the project.
 
-- **Improved Accuracy**: The Core Model (GBR) was 6.31% more accurate (as measured by WAPE) than the existing model_actual.
+The conclusion is undeniable: The "GBR Base" model finds the financial sweet spot, reducing both waste and lost sales relative to the client's model. The "Hybrid" model's attempt to cover 100% of risk created catastrophic waste.
 
-- **Per-Product Risk Management**: We moved from a "one-size-fits-all" safety stock to a dynamic, statistically-driven buffer calculated for all 1,000 products based on their individual volatility.
+| Scenario |	Net Benefit (Total) |	Cost of Waste (Spoilage) |	Cost of Lost Sales |
+| 1. Model Actual (Client) |	$9.78B	| $6.01B |	$3.15B |
+| 2. GBR Base (Our Solution) |	**$10.39B** |	$5.75B |	$2.81B |
+| 3. Hybrid Model (Investigation) |	$-7.44B	| $26.32B |	$0.06B |
 
-- **Actionable Inventory Policy**: The final deliverable (politica_inventario_final_2024.csv) is a production-ready file that combines the mean forecast (prediccion_ventas) with the calculated risk (stock_de_seguridad).
+The GBR Base model provides a $610 Million uplift in Net Benefit over the client's current system, proving its superiority.
 
-## 4. Solution Visualization
+## 4. Evidence & Solution Visualization
 
-**2024 Inventory Policy (Sample Product)**
-This chart shows the base forecast (blue line) and the safety stock buffer (green area) calculated by the GPD model to achieve a 98% Service Level.
+**The Economic Proof**
+backtest_beneficio_net.png and backtest_costos_totales.png, illustrate why the complex hybrid model was rejected and the GBR Base model was chosen.
 
-**Historical Traceability + Forecast**
-This chart demonstrates the solution's impact by plotting historical actual sales (2017-2023) and seamlessly connecting them to the new inventory policy for 2024 (forecast + risk).
+Net Benefit (Higher is Better)
+![alt text](reports/figures/backtest_beneficio_neto.png)
 
-## 5. Repository Structure 
+Total Costs (Lower is Better)
+![alt text](reports/figures/backtest_costos_totales.png)
+
+**The Final Solution: GBR Forecast**
+The final recommended solution is to replace the model_actual with our GBR forecast. This graph shows the historical data (blue) followed by our winning GBR forecast (green).
+
+# 5. Repository Structure 
 
 The project is modularized into a 4-notebook pipeline:
 
@@ -48,20 +57,20 @@ project-repository/
 │   ├── interim/
 │   │   └── model_core_validation.csv  (Output of N-01 -> Input for N-02)
 │   └── processed/
-│       ├── stock_seguridad_por_producto.csv (Output of N-02)
-│       ├── predicciones_demanda_2024.csv    (Output of N-03)
+│       ├── predicciones_demanda_2024.csv    (Output of N-03, The winning forecast)
 │       └── politica_inventario_final_2024.csv (FINAL DELIVERABLE)
 ├── models/
 │   └── gbr_model.joblib               (Trained GBR model, Output of N-01)
 ├── notebooks/
-│   ├── 01-model_core.ipynb            (GBR Training & Validation)
-│   ├── 02-model_risk_gpd.ipynb        (Per-Product Safety Stock Calculation)
-│   ├── 03-model_inference.ipynb       (Re-training & 2024 Forecasting)
+│   ├── 01-model_core.ipynb            (GBR Training & Validation, the "Winner")
+│   ├── 02-model_risk_gpd.ipynb        (Investigation & Economic Backtesting)
+│   ├── 03-model_inference.ipynb       (Re-training & Inference of the Winning Model)
 │   └── 04-generar_reporte_final.ipynb (Final Report Assembly & Visualization)
 ├── reports/
 │   └── figures/
-│       ├── politica_inventario_prod_0.png
-│       └── trazabilidad_historica_prod_0.png
+│       ├── backtest_beneficio_neto.png
+│       ├── backtest_costos_totales.png
+│       └── trazabilidad_final_gbr.png
 ├── requirements.txt                   (Project dependencies)
 └── README.md                          (This file)
 ```
@@ -73,20 +82,28 @@ project-repository/
     - Saves the validated model (gbr_model.joblib) and the validation results (model_core_validation.csv).
 
 2. 02-model_risk_gpd.ipynb:
-    - Loads the validation results.
-    - Calculates the GBR model's residuals (errors).
-    - Iterates through each prod_id, fits a GPD model to its positive-error-tail, and calculates the required safety stock for a 98% service level.
-    - Saves the per-product safety stock map (stock_seguridad_por_producto.csv).
+    - The most critical notebook. Loads the validation data.
+
+    - Investigates multiple risk models (GPD, Heuristics) to create a "Hybrid Model."
+
+    - Runs the Economic Backtest (the 3-way comparison) which proves the Hybrid Model is financially unviable and the GBR Base Model is the winner.
+
+    - Generates the key "Evidence" charts.
 
 3. 03-model_inference.ipynb:
-    - Loads the hyperparameters from the validated model (gbr_model.joblib).
-    - Re-trains the GBR model on the full historical dataset (2012-2023) to ensure maximum accuracy for the future.
-    - Generates the base forecast for all 12 months of 2024 (predicciones_demanda_2024.csv).
+    - Loads the hyperparameters of the winning GBR model.
+
+    - Re-trains the GBR model on the full historical dataset (2012-2023).
+
+    - Generates the final 2024 forecast (predicciones_demanda_2024.csv).
 
 4. 04-generar_reporte_final.ipynb:
-    - Loads the base forecast (from N-03) and the safety stock map (from N-02).
-    - Merges them to create the final, actionable report: politica_inventario_final_2024.csv.
-    - Generates the project's key visualizations.
+
+    - Loads the winning 2024 forecast.
+
+    - Creates the final, simplified inventory policy.
+
+    - Generates the "Solution" traceability chart.
 
 ## 6. How to Run the Project
 1. Clone the repository.
@@ -109,58 +126,40 @@ pip install -r requirements.txt
 ## 7. Detailed Analysis
 ---
 ### **Model Construction & Validation**
-1. **Hybrid Model (GBR + GPD)** Our solution consists of two components:
+The final solution is the **GBR Core Model**.
 
-    - **Core Model (GBR)**: A GradientBoostingRegressor was chosen for its high performance in handling seasonality and complex interactions across a large set of 1,000 time series.
+- Model: A GradientBoostingRegressor was chosen for its high performance in handling seasonality and complex interactions across 1,000 time series.
 
-    - **Risk Model (GPD)**: We apply Generalized Pareto Distribution (GPD), a technique from Extreme Value Theory (EVT), to the model's positive residuals (under-forecasts). This allows us to precisely model the probability of extreme demand spikes and calculate the exact inventory needed to meet a target service level (98%).
+- Precision (WAPE): We used WAPE (Weighted Absolute Percentage Error) as the primary technical metric. On 2023 data, our GBR model was 6.31% more accurate than the client's model_actual.
 
-2. **Validation Metrics**
+- Forecast Window (12 Months): A 12-month window (all of 2024) was selected to allow for strategic planning around the strong annual seasonality of agricultural products.
 
-    - **Precision (WAPE)**: We used WAPE (Weighted Absolute Percentage Error) as the primary metric, as it is directly interpretable by the business. On 2023 data, our GBR model was 6.31% more accurate than the client's model_actual.
+**Measuring Economic Benefit ($) - The Core Finding**
 
-    - **Risk (Backtesting)**: We validated the GPD model by backtesting it against 2023, confirming that the calculated per-product safety stock would have covered the majority of unexpected demand spikes, reducing lost sales.
+As shown in Section 3, the key validation was an Economic Backtest. This simulation proved that the complex risk model (GPD) was a failure, as the data's extreme outliers meant the cost to cover all risk ($26.32B in waste) was far greater than the risk itself ($3.15B in lost sales).
 
-3. **Forecast Window (12 Months)**: A 12-month window (all of 2024) was selected for the projection. Given the strong annual seasonality of agricultural products (harvests, consumption seasons), a 12-month window is essential for strategic planning.
+The backtest proved that simply replacing the model_actual with our more precise GBR Base Model was the optimal path, unlocking $610M in net benefit by finding a better balance between waste and lost sales.
 
-### **Measuring Economic Benefit ($)**
-To quantify the financial value of this solution, we conducted an Economic Backtest using 2023 data.
-
-- **Metric 1**: Reduced Spoilage Cost (Over-stocking) We simulated inventory decisions month-by-month. Any time a forecast was higher than the actual demand, we calculated the cost of the resulting excess inventory.
-
-    - *Spoilage_Cost = (Forecast - Actual_Sales) * Unit_Cost*
-
-    - Result: Our model, by being more precise and applying risk buffers only where needed, dramatically reduces this cost.
-
-- **Metric 2**: Reduced Opportunity Cost (Lost Sales) This is the key benefit of the GPD Risk Model. We simulated every instance where actual demand exceeded the total ordered stock.
-
-    - *Opportunity_Cost = (Actual_Sales - Total_Stock_Ordered) * Unit_Margin*
-
-    - Result: The model_actual (which only orders the mean forecast) loses all sales from demand spikes. Our hybrid model (Base Forecast + Safety Stock) captures a significant percentage of this lost demand, converting it directly into revenue.
 
 ### **Production Methodology (MLOps)**
-A model only provides value when it is reliably in production. We propose the following deployment and monitoring (MLOps) framework:
+We propose the following deployment and monitoring (MLOps) framework:
 
 #### **Phase 1: Shadow Mode Deployment**
 
-- Action: For the first month, the pipeline runs in production, but its outputs are not used for purchasing decisions. It runs in parallel with the model_actual.
+- Action: For the first month, the GBR pipeline runs in parallel with the model_actual. Its results are logged but not used for purchasing.
 
-- Purpose: To compare our model's live predictions against the old model and against reality, validating its performance without operational risk.
+- Purpose: To validate that the live model's performance (WAPE) matches the backtest results without operational risk.
 
 #### **Phase 2: Canary Deployment**
 
-- Action: In month two, the model is activated to make real purchasing decisions, but only for a limited, controlled group of products (e..g., 10% of SKUs).
+- Action: In month two, the GBR model's recommendations are used for a limited group of products (e.g., 10% of SKUs).
 
-- Purpose: To verify the real-world impact on inventory levels and costs in a contained environment.
+- Purpose: To verify the real-world impact on inventory levels and costs.
 
-#### **Phase 3: Continuous Monitoring & Maintenance Once fully deployed, the model is monitored via automated dashboards**:
+#### **Phase 3: Continuous Monitoring & Maintenance**:
 
-- **Performance Monitoring (Model Drift)**: WAPE is tracked monthly. If the error rate begins to climb, an alert is triggered for a Data Scientist to review the model.
+- Performance Monitoring (Model Drift): WAPE is tracked monthly. If the error rate climbs, an alert is triggered for review.
 
-- **Data Monitoring (Data Drift)**: Alerts are set to detect if the input data changes suddenly (e.g., a precio_promedio spikes, or a new prod_id appears).
+- Data Monitoring (Data Drift): Alerts are set to detect if input data (like precio_promedio) changes suddenly.
 
-- **Retraining Plan**:
-
-    - **Core Model (GBR)**: Automatically retrained monthly with the latest sales data (as built in notebook 03).
-
-    - **Risk Model (GPD)**: Manually retrained every 6-12 months, as a product's underlying risk profile is more stable than its sales trend.
+- Retraining Plan: The Core Model (GBR) is automatically retrained monthly with the latest sales data (as built in notebook 03) to keep the forecast relevant.
