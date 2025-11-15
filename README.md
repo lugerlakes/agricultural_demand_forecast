@@ -92,14 +92,11 @@ project-repository/
 3. 03-model_inference.ipynb:
     - Loads the hyperparameters of the winning GBR model.
     - Re-trains the GBR model on the full historical dataset (2012-2023).
-    - Generates the final 2024 forecast (predicciones_demanda_2024.csv).
+    - Generates the final 2024 forecast (demand_forecasts_2024.csv).
 
-4. 04-generar_reporte_final.ipynb:
-
+4. 04-generate_final_report.ipynb:
     - Loads the winning 2024 forecast.
-
     - Creates the final, simplified inventory policy.
-
     - Generates the "Solution" traceability chart.
 
 ## 6. How to Run the Project
@@ -123,40 +120,28 @@ pip install -r requirements.txt
 ## 7. Detailed Analysis
 ---
 ### **Model Construction & Validation**
-The final solution is the **GBR Core Model**.
+The final solution is the GBR Core Model, as its validation proved it to be the most financially sound.
+- **Model**: A GradientBoostingRegressor was chosen for its high performance in handling seasonality and complex interactions across 1,000+ time series.
 
-- Model: A GradientBoostingRegressor was chosen for its high performance in handling seasonality and complex interactions across 1,000 time series.
+- **Precision (WAPE)**: We used WAPE (Weighted Absolute Percentage Error) as the primary technical metric. On 2023 data, our GBR model was 6.31% more accurate than the client's model_actual.
 
-- Precision (WAPE): We used WAPE (Weighted Absolute Percentage Error) as the primary technical metric. On 2023 data, our GBR model was 6.31% more accurate than the client's model_actual.
+- **Forecast Window (12 Months)**: A 12-month window (all of 2024) was selected to allow for strategic planning around the strong annual seasonality of agricultural products.
 
-- Forecast Window (12 Months): A 12-month window (all of 2024) was selected to allow for strategic planning around the strong annual seasonality of agricultural products.
-
-**Measuring Economic Benefit ($) - The Core Finding**
-
-As shown in Section 3, the key validation was an Economic Backtest. This simulation proved that the complex risk model (GPD) was a failure, as the data's extreme outliers meant the cost to cover all risk ($26.32B in waste) was far greater than the risk itself ($3.15B in lost sales).
-
-The backtest proved that simply replacing the model_actual with our more precise GBR Base Model was the optimal path, unlocking $610M in net benefit by finding a better balance between waste and lost sales.
+- **Economic Benefit ($) - The Core Finding:** As shown in Section 3, the key validation was an Economic Backtest. This simulation proved that the complex risk model (GPD/Heuristics) was a failure, as the data's extreme outliers meant the cost to cover all risk ($26.32B in waste) was far greater than the risk itself ( $3.15Bin lost sales). The backtest proved that simply replacing themodel\_actual\ with our more precise GBR Base Model was the optimal path, unlocking $610M in net benefit.
 
 
 ### **Production Methodology (MLOps)**
-We propose the following deployment and monitoring (MLOps) framework:
+We propose the following deployment and monitoring (MLOps) framework for the winning GBR model:
 
 #### **Phase 1: Shadow Mode Deployment**
-
 - Action: For the first month, the GBR pipeline runs in parallel with the model_actual. Its results are logged but not used for purchasing.
-
 - Purpose: To validate that the live model's performance (WAPE) matches the backtest results without operational risk.
 
 #### **Phase 2: Canary Deployment**
-
 - Action: In month two, the GBR model's recommendations are used for a limited group of products (e.g., 10% of SKUs).
-
 - Purpose: To verify the real-world impact on inventory levels and costs.
 
 #### **Phase 3: Continuous Monitoring & Maintenance**:
-
 - Performance Monitoring (Model Drift): WAPE is tracked monthly. If the error rate climbs, an alert is triggered for review.
-
 - Data Monitoring (Data Drift): Alerts are set to detect if input data (like precio_promedio) changes suddenly.
-
-- Retraining Plan: The Core Model (GBR) is automatically retrained monthly with the latest sales data (as built in notebook 03) to keep the forecast relevant.
+- Retraining Plan: The Core Model (GBR) is automatically retrained monthly with the latest sales data (as built in 03-model_inference.ipynb) to keep the forecast relevant.
