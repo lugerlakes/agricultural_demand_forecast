@@ -45,7 +45,7 @@ These charts illustrate *why* the complex hybrid model was rejected and the GBR 
 ### The Final Solution: GBR Forecast
 The final recommended solution is to replace the `model_actual` with our GBR forecast. This graph shows the historical data (blue) followed by our winning GBR forecast (green).
 
-![Historical Traceability and Final GBR Forecast](./reports/figures/trazabilidad_final_gbr.png)
+![Historical Traceability and Final GBR Forecast](./reports/figures/final_traceability_gbr.png)
 
 ## 5. Repository Structure
 
@@ -59,8 +59,8 @@ project-repository/
 │   ├── interim/
 │   │   └── model_core_validation.csv  (Output of N-01 -> Input for N-02)
 │   └── processed/
-│       ├── predicciones_demanda_2024.csv    (Output of N-03, The winning forecast)
-│       └── politica_inventario_final_2024.csv (FINAL DELIVERABLE)
+│       ├── demand_forecasts_2024.csv    (Output of N-03, The winning forecast)
+│       └── final_inventory_policy_2024.csv (FINAL DELIVERABLE)
 ├── models/
 │   └── gbr_model.joblib               (Trained GBR model, Output of N-01)
 ├── notebooks/
