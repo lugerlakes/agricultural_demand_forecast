@@ -1,23 +1,22 @@
 # **Demand Forecasting for Agricultural Products**
 *A Senior-Level Analysis in Model Validation & Economic Backtesting*
 --
+
 ## 1. Project Summary
-This project documents the development of a Data Science solution for an agricultural products distributor facing critical inventory problems. While the initial goal was to build a complex hybrid model, the project's key finding came from a rigorous economic backtest that invalidated this hypothesis.
+This project documents the development of a Data Science solution for an agricultural products distributor facing critical inventory problems. While the initial goal was to build a complex hybrid model, the project's key finding came from a **rigorous economic backtest** that invalidated this hypothesis.
 
 The analysis, performed on 2023 data, revealed two crucial insights:
 
-1. The complex "Hybrid Model" (GBR + Risk) was a financial disaster, generating $-7.44 Billion in net losses due to extreme data outliers creating massive waste costs.
-
-2. The "GBR Base Model" (high-precision forecast) was the clear winner, outperforming the client's current model_actual by $610 Million in net benefit.
+1.  The complex "Hybrid Model" (GBR + Risk) was a financial disaster, generating **$-7.44 Billion** in net losses due to extreme data outliers creating massive waste costs.
+2.  The "GBR Base Model" (high-precision forecast) was the clear winner, outperforming the client's current `model_actual` by **$610 Million** in net benefit.
 
 This project evolved from a forecasting challenge into a senior-level case study on how to use economic backtesting to validate a hypothesis, pivot, and select the optimal, high-value solution.
 
 ## 2. The Business Problem
 The client was facing two primary, costly challenges:
 
-1. **Excess Inventory**: The previous model (model_actual) often overestimated demand, leading to high storage costs and spoilage of perishable goods.
-
-2. **Lost Sales**: The same model underestimated demand for volatile products, resulting in stockouts and lost revenue.
+1.  **Excess Inventory**: The previous model (`model_actual`) often overestimated demand, leading to high storage costs and spoilage of perishable goods.
+2.  **Lost Sales**: The same model underestimated demand for volatile products, resulting in stockouts and lost revenue.
 
 ## 3. Key Findings: Economic Backtest
 Instead of relying on technical metrics like WAPE alone, we simulated the financial performance of three models on 2023 data. This economic backtest became the core of the project.
@@ -26,31 +25,33 @@ The conclusion is undeniable: The "GBR Base" model finds the financial sweet spo
 
 | Scenario | Net Benefit (Total) | Cost of Waste (Spoilage) | Cost of Lost Sales |
 | :--- | :---: | :---: | :---: |
-| **1. Model Actual (Cliente)** | \$9.78B | \$6.01B | \$3.15B |
+| **1. Model Actual (Client)** | \$9.78B | \$6.01B | \$3.15B |
 | **2. GBR Base (Our Solution)** | **\$10.39B** | **\$5.75B** | **\$2.81B** |
 | **3. Hybrid Model (Investigation)** | `$-7.44B` | `$26.32B` | `$0.06B` |
 
-The GBR Base model provides a $610 Million uplift in Net Benefit over the client's current system, proving its superiority.
+The GBR Base model provides a **$610 Million uplift in Net Benefit** over the client's current system, proving its superiority.
 
 ## 4. Evidence & Solution Visualization
 
-**The Economic Proof**
-backtest_beneficio_net.png and backtest_costos_totales.png, illustrate why the complex hybrid model was rejected and the GBR Base model was chosen.
+### The Economic Proof
+These charts illustrate *why* the complex hybrid model was rejected and the GBR Base model was chosen.
 
-Net Benefit (Higher is Better)
-![alt text](reports/figures/backtest_beneficio_neto.png)
+**Net Benefit (Higher is Better)**
+![Net Benefit Backtest](./reports/figures/backtest_beneficio_neto.png)
 
-Total Costs (Lower is Better)
-![alt text](reports/figures/backtest_costos_totales.png)
+**Total Costs (Lower is Better)**
+![Total Costs Backtest](./reports/figures/backtest_costos_totales.png)
 
-**The Final Solution: GBR Forecast**
-The final recommended solution is to replace the model_actual with our GBR forecast. This graph shows the historical data (blue) followed by our winning GBR forecast (green).
+### The Final Solution: GBR Forecast
+The final recommended solution is to replace the `model_actual` with our GBR forecast. This graph shows the historical data (blue) followed by our winning GBR forecast (green).
 
-# 5. Repository Structure 
+![Historical Traceability and Final GBR Forecast](./reports/figures/trazabilidad_final_gbr.png)
 
-The project is modularized into a 4-notebook pipeline:
+## 5. Repository Structure
 
-```bash 
+The project is modularized into a 4-notebook pipeline that tells the story of the analysis.
+
+```bash
 project-repository/
 ├── data/
 │   ├── raw/
@@ -64,9 +65,9 @@ project-repository/
 │   └── gbr_model.joblib               (Trained GBR model, Output of N-01)
 ├── notebooks/
 │   ├── 01-model_core.ipynb            (GBR Training & Validation, the "Winner")
-│   ├── 02-model_risk_gpd.ipynb        (Investigation & Economic Backtesting)
+│   ├── 02-risk_investigation.ipynb    (Investigation & Economic Backtesting)
 │   ├── 03-model_inference.ipynb       (Re-training & Inference of the Winning Model)
-│   └── 04-generar_reporte_final.ipynb (Final Report Assembly & Visualization)
+│   └── 04-generate_final_report.ipynb (Final Report Assembly & Visualization)
 ├── reports/
 │   └── figures/
 │       ├── backtest_beneficio_neto.png
@@ -84,18 +85,13 @@ project-repository/
 
 2. 02-model_risk_gpd.ipynb:
     - The most critical notebook. Loads the validation data.
-
-    - Investigates multiple risk models (GPD, Heuristics) to create a "Hybrid Model."
-
+    - Investigates the "Hybrid Model" hypothesis (using GPD and robust heuristics).
     - Runs the Economic Backtest (the 3-way comparison) which proves the Hybrid Model is financially unviable and the GBR Base Model is the winner.
-
     - Generates the key "Evidence" charts.
 
 3. 03-model_inference.ipynb:
     - Loads the hyperparameters of the winning GBR model.
-
     - Re-trains the GBR model on the full historical dataset (2012-2023).
-
     - Generates the final 2024 forecast (predicciones_demanda_2024.csv).
 
 4. 04-generar_reporte_final.ipynb:

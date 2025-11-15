@@ -1,0 +1,6 @@
+demand_forecasting/
+
+__pycache__/
+*.pyc
+
+.ipynb_checkpoints/
