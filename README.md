@@ -24,10 +24,10 @@ Instead of relying on technical metrics like WAPE alone, we simulated the financ
 
 The conclusion is undeniable: The "GBR Base" model finds the financial sweet spot, reducing both waste and lost sales relative to the client's model. The "Hybrid" model's attempt to cover 100% of risk created catastrophic waste.
 
-| Scenario |	Net Benefit (Total) |	Cost of Waste (Spoilage) |	Cost of Lost Sales |
-| 1. Model Actual (Client) |	$9.78B	| $6.01B |	$3.15B |
-| 2. GBR Base (Our Solution) |	**$10.39B** |	$5.75B |	$2.81B |
-| 3. Hybrid Model (Investigation) |	$-7.44B	| $26.32B |	$0.06B |
+| Scenario |	Net Benefit (Total) |	Cost of Waste (Spoilage) |	Cost of Lost Sales 
+| 1. Model Actual (Client) |	$9.78B	| $6.01B |	$3.15B 
+| 2. GBR Base (Our Solution) |	**$10.39B** |	$5.75B |	$2.81B 
+| 3. Hybrid Model (Investigation) |	$-7.44B	| $26.32B |	$0.06B 
 
 The GBR Base model provides a $610 Million uplift in Net Benefit over the client's current system, proving its superiority.
 
