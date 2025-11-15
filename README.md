@@ -37,10 +37,10 @@ The GBR Base model provides a **$610 Million uplift in Net Benefit** over the cl
 These charts illustrate *why* the complex hybrid model was rejected and the GBR Base model was chosen.
 
 **Net Benefit (Higher is Better)**
-![Net Benefit Backtest](./reports/figures/backtest_beneficio_neto.png)
+![Net Benefit Backtest](./reports/figures/backtest_profit_net.png)
 
 **Total Costs (Lower is Better)**
-![Total Costs Backtest](./reports/figures/backtest_costos_totales.png)
+![Total Costs Backtest](./reports/figures/backtest_total_costs.png)
 
 ### The Final Solution: GBR Forecast
 The final recommended solution is to replace the `model_actual` with our GBR forecast. This graph shows the historical data (blue) followed by our winning GBR forecast (green).
