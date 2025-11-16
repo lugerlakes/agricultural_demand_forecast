@@ -1,6 +1,23 @@
+# Python virtual environments
+venv/
+.venv/
 demand_forecasting/
 
+# Docker/Airflow logs
+logs/
+
+# Secrets file
+.env
+
+# Python caches
 __pycache__/
 *.pyc
 
+# Jupyter caches
 .ipynb_checkpoints/
+
+# Local IDE/DB files
+.vscode/
+.idea/
+airflow.db
+*.pid
