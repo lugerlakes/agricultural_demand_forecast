@@ -183,3 +183,84 @@ This is the proposed deployment and monitoring framework for this new pipeline:
 - **Performance Monitoring (Model Drift)**: The run_validation_and_backtest task in our Airflow DAG automatically acts as our monitor. By logging its financial results (Beneficio Neto) each month, we can build a dashboard (e.g., in Streamlit or PowerBI) to track model performance. If the Net Benefit begins to trend down, that is Model Drift, and a Data Scientist is alerted to review.
 - **Data Monitoring (Data Drift)**: A new task would be added to the Airflow DAG to run before the validation task. This task would use a library (like Evidently AI or Pandas Profiling) to check if the new raw_data inputs have changed (e.g., precio_promedio is suddenly null, or a new prod_id appears) and alert the team.
 - **Retraining Plan**: The Core Model (GBR) is automatically retrained monthly with the latest sales data. This is already built into the run_final_inference task in our pipeline, keeping the forecast relevant.
+
+
+
+
+
+cat > make_dicom.py << 'EOF'
+#!/usr/bin/env python3
+import pydicom
+from pydicom.dataset import FileDataset, FileMetaDataset
+from pydicom.uid import generate_uid, ExplicitVRLittleEndian
+import sys, datetime
+
+def make_dicom(patient_name="TEST^PATIENT", study_desc="Test Study", out="test.dcm"):
+    file_meta = FileMetaDataset()
+    file_meta.MediaStorageSOPClassUID = pydicom.uid.SecondaryCaptureImageStorage
+    file_meta.MediaStorageSOPInstanceUID = generate_uid()
+    file_meta.ImplementationClassUID = generate_uid()
+    file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+
+    ds = FileDataset(out, {}, file_meta=file_meta, preamble=b"\x00"*128)
+    ds.is_little_endian = True
+    ds.is_implicit_VR = False
+    ds.SOPClassUID = file_meta.MediaStorageSOPClassUID
+    ds.SOPInstanceUID = file_meta.MediaStorageSOPInstanceUID
+    ds.StudyInstanceUID = generate_uid()
+    ds.SeriesInstanceUID = generate_uid()
+    ds.PatientName = patient_name
+    ds.PatientID = "998812"
+    ds.StudyDescription = study_desc
+    ds.Modality = "OT"
+    ds.ContentDate = datetime.date.today().strftime("%Y%m%d")
+    ds.ContentTime = datetime.datetime.now().strftime("%H%M%S")
+    ds.Rows = 1
+    ds.Columns = 1
+    ds.SamplesPerPixel = 1
+    ds.PhotometricInterpretation = "MONOCHROME2"
+    ds.BitsAllocated = 8
+    ds.BitsStored = 8
+    ds.HighBit = 7
+    ds.PixelRepresentation = 0
+    ds.PixelData = b"\x00"
+    ds.save_as(out, write_like_original=False)
+    print(f"Wrote {out}")
+
+if __name__ == "__main__":
+    pname = sys.argv[1] if len(sys.argv) > 1 else "TEST^PATIENT"
+    out = sys.argv[2] if len(sys.argv) > 2 else "test.dcm"
+    make_dicom(pname, out=out)
+EOF
+python3 make_dicom.py
+
+
+
+
+
+cat > upload.py << 'EOF'
+#!/usr/bin/env python3
+import sys, requests
+
+def upload(path, url="http://dicom-go-boom:8080/studies"):
+    with open(path, "rb") as f:
+        data = f.read()
+    boundary = "DICOMBOUNDARY1234567890"
+    body = (f"--{boundary}\r\nContent-Type: application/dicom\r\n\r\n").encode() + data + f"\r\n--{boundary}--\r\n".encode()
+    headers = {"Content-Type": f'multipart/related; type="application/dicom"; boundary={boundary}'}
+    r = requests.post(url, data=body, headers=headers, timeout=10)
+    print("Status:", r.status_code)
+    print("Body:", r.text[:2000])
+
+if __name__ == "__main__":
+    path = sys.argv[1] if len(sys.argv) > 1 else "test.dcm"
+    upload(path)
+EOF
+python3 upload.py test.dcm
+
+
+
+
+python3 -c "import pydicom,datetime;from pydicom.dataset import FileDataset,FileMetaDataset;from pydicom.uid import generate_uid,ExplicitVRLittleEndian;fm=FileMetaDataset();fm.MediaStorageSOPClassUID=pydicom.uid.SecondaryCaptureImageStorage;fm.MediaStorageSOPInstanceUID=generate_uid();fm.ImplementationClassUID=generate_uid();fm.TransferSyntaxUID=ExplicitVRLittleEndian;ds=FileDataset('test.dcm',{},file_meta=fm,preamble=b'\x00'*128);ds.is_little_endian=True;ds.is_implicit_VR=False;ds.SOPClassUID=fm.MediaStorageSOPClassUID;ds.SOPInstanceUID=fm.MediaStorageSOPInstanceUID;ds.StudyInstanceUID=generate_uid();ds.SeriesInstanceUID=generate_uid();ds.PatientName='TEST^PATIENT';ds.PatientID='998812';ds.StudyDescription='Test';ds.Modality='OT';ds.ContentDate=datetime.date.today().strftime('%Y%m%d');ds.ContentTime=datetime.datetime.now().strftime('%H%M%S');ds.Rows=1;ds.Columns=1;ds.SamplesPerPixel=1;ds.PhotometricInterpretation='MONOCHROME2';ds.BitsAllocated=8;ds.BitsStored=8;ds.HighBit=7;ds.PixelRepresentation=0;ds.PixelData=b'\x00';ds.save_as('test.dcm',write_like_original=False);print('ok')"
+
+curl -s -X POST http://dicom-go-boom:8080/studies -F "file=@test.dcm;type=application/dicom"
